@@ -1,0 +1,18 @@
+# base
+*.o
+*.obj
+*.a
+*.lib
+
+# cc124
+output/
+
+# pm124
+output/
+
+# vscode-ext.lang124-synhl
+vscode-ext/lang124-synhl/*.vsix
+
+# vscode-ext.lang124-lsrv
+vscode-ext/lang124-lsrv/node_modules/
+vscode-ext/lang124-lsrv/*.vsix

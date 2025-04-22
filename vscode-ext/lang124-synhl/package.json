@@ -1,0 +1,25 @@
+{
+  "name": "lang124-synhl",
+  "displayName": "Lang124 SyntaxHighLight",
+  "description": "lang124 的语法高亮扩展",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.99.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "lang124",
+      "aliases": ["Lang124", "lang124"],
+      "extensions": [".124"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "lang124",
+      "scopeName": "source.L124",
+      "path": "./syntaxes/lang124.tmLanguage.json"
+    }]
+  }
+}

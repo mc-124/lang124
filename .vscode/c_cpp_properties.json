@@ -1,0 +1,89 @@
+{
+    "configurations": [
+        {
+            "name": "cc124.win32-msvc-x64",
+            "includePath": [
+                "${workspaceFolder}/cc124/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.22621.0",
+            "compilerPath": "cl.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64",
+            "compilerPathInCppPropertiesJson": "cl.exe",
+            "mergeConfigurations": false,
+            "recursiveIncludes": {
+                "reduce": "default",
+                "priority": "afterSystemIncludes",
+                "order": "depthFirst"
+            },
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true
+            }
+        },
+        {
+            "name": "cc124.win32-mingww64-x64",
+            "includePath": [
+                "${workspaceFolder}/cc124/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.22621.0",
+            "compilerPath": "gcc.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-gcc-x64",
+            "compilerPathInCppPropertiesJson": "cl.exe",
+            "mergeConfigurations": false,
+            "recursiveIncludes": {
+                "reduce": "default",
+                "priority": "afterSystemIncludes",
+                "order": "depthFirst"
+            },
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true
+            }
+        },
+        {
+            "name": "cc124.linux-gcc-x64",
+            "includePath": [
+                "${workspaceFolder}/cc124/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.22621.0",
+            "compilerPath": "gcc",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        },
+        {
+            "name": "cc124.osx-gcc-x64",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.22621.0",
+            "compilerPath": "gcc",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "macos-gcc-x64"
+        }
+    ],
+    "version": 4
+}
