@@ -3,7 +3,7 @@
         {
             "name": "cc124.win32-msvc-x64",
             "includePath": [
-                "${workspaceFolder}/cc124/**"
+                "${workspaceFolder}/cc124-cpp/src/**"
             ],
             "defines": [
                 "_DEBUG",
@@ -15,7 +15,6 @@
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "windows-msvc-x64",
-            "compilerPathInCppPropertiesJson": "cl.exe",
             "mergeConfigurations": false,
             "recursiveIncludes": {
                 "reduce": "default",
@@ -29,7 +28,7 @@
         {
             "name": "cc124.win32-mingww64-x64",
             "includePath": [
-                "${workspaceFolder}/cc124/**"
+                "${workspaceFolder}/cc124-cpp/src/**"
             ],
             "defines": [
                 "_DEBUG",
@@ -41,7 +40,6 @@
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "windows-gcc-x64",
-            "compilerPathInCppPropertiesJson": "cl.exe",
             "mergeConfigurations": false,
             "recursiveIncludes": {
                 "reduce": "default",
@@ -55,7 +53,7 @@
         {
             "name": "cc124.linux-gcc-x64",
             "includePath": [
-                "${workspaceFolder}/cc124/**"
+                "${workspaceFolder}/cc124-cpp/src/**"
             ],
             "defines": [
                 "_DEBUG",
