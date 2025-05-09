@@ -1,0 +1,87 @@
+关键字：
+use         导入命名空间   或者在一个命名空间里引入同级或更低级的命名空间   或给类型起小名 use NewType = OldType  使用 c:"filepath" 导入 C 头文件（直接），使用 cpp:"filepath" 导入 C++ 头文件（依赖兼容层）
+module      定义命名空间
+fn          函数支持嵌套定义   函数名前加上@为定义修饰器函数
+let         定义不可变量    可运行时初始化  可覆盖定义
+var         定义可变变量    可运行时初始化  可覆盖定义
+const       定义常量        编译时求值 位于全局 静态不可覆盖
+static      定义静态变量    编译时求职 位于全局 静态不可覆盖
+extern      引入外部函数    或者把定义的东西改成 C 规范    或者声明局部变量为全局（类似py的global）
+do          执行代码块并返回值
+loop        无限循环
+while       条件循环    while(true) 会被编译器优化成 loop ，else的代码会被剔除      配合 do 关键字可以实现先循环后判断 (do while)
+for         步骤循环/遍历循环 支持两种语法   for (;;) 会被编译器优化成 loop ，else的代码会被剔除    支持遍历，通过调用类型的 __each__ 方法实现 for (<init>;<cond>;<step>)|for (let i:i32 = 1..10..2)|for (let i = array)
+try         执行代码块并配合 catch 捕捉异常     支持 RAII: try(){}    此语法是糖，背后的实现是 Result 机制  一个 try 后面最少跟着一个 catch 或 finally
+catch       配合 try 捕捉异常
+finally     当 try 代码和 catch 代码执行完毕后立即运行
+if          如果分支结构
+elif        否则如果分支结构
+else        否则分支结构    也可以配合 try 使用，在未捕捉到异常时被执行     也可以配合 for/while 使用，条件不满足时执行，使用 break 打断循环时不会执行
+switch      匹配结构，有穿透
+match       匹配结构，无穿透
+case        匹配一个或多个值
+default     未匹配到时执行的代码
+asm         内联汇编    当语法为 "LLVM_IR" 时为内联 IR 模式
+del         释放资源（删除所有权）  调用对象的 __delete__ 方法释放资源    超出作用域的对象会调用一次这个方法释放资源
+break       打断循环或穿透
+continue    跳过本次循环
+class       创建类 语法糖 方法函数存在全局 类变量和虚表储存在结构体
+return      函数返回
+new         初始化对象 默认在栈分配内存    可通过 #[op_symbol("new")] 更改分配行为
+heap        初始化对象 只会在堆分配内存 也能让变量被分配在堆 依赖 stdlib    #[op_symbol("heap")]
+virtual     使得类的方法函数可被动态替换并储存在虚表 新的方法函数必须和旧的参数类型、返回值完全相同
+pub         使得定义的东西被公开
+enum        定义枚举类型
+struct      定义结构体类型 支持链表
+union       定义联合体类型
+true        常量    布尔类型 真
+false       常量    布尔类型 假
+async       异步执行 此类语句依赖 stdlib    #[op_symbol("async")] 此属性描述的函数承担异步线程池处理等
+await       异步等待                        #[op_symbol("await")] 此属性描述的函数承担异步等待
+self        常量    在 Class 中是指向类自身的指针类型   其余地方是 NULL
+super       在子类的方法函数中引用父类的东西
+throw       抛出异常    被 try-catch 捕获    是语法糖，背后的实现是 Result => Err
+null        常量    代表空指针或无返回值的函数
+
+
+符号：
++   add
+-   sub
+*   mul
+/   div
+\   sdiv
+^   pwr
+%   rem
+++  self-add
+--  self-sub
+&   and
+|   or
+!   not
+!&  xand
+!|  xor
+
+==  eq
+!=  ne
+>   gr
+<   lt
+>=  ge
+<=  le
+in  contain
+&&  logic-and   
+||  logic-or    
+
+=   assign
+::  subitem
+.   member
+$   raw_name
+?   macro_name
+?$  raw_macro_name
+..  number_range
+''  u32
+""  u8[]+\0
+``  
+
+@   decorator_function
+;   newline
+\\  comment
+#[...]  attribute
