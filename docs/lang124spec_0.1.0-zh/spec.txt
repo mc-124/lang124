@@ -1,16 +1,17 @@
 关键字：
-use         导入命名空间   或者在一个命名空间里引入同级或更低级的命名空间   或给类型起小名 use NewType = OldType  使用 c:"filepath" 导入 C 头文件（直接），使用 cpp:"filepath" 导入 C++ 头文件（依赖兼容层）
+use         导入命名空间   或者在一个命名空间里引入同级或更低级的命名空间   或给类型起小名 use NewType = OldType  使用 c:"filepath" 导入 C 头文件（直接），使用 cpp:"filepath" 导入 C++ 头文件（依赖 C++ 编译器）
 module      定义命名空间
+macro       定义宏
 fn          函数支持嵌套定义   函数名前加上@为定义修饰器函数
 let         定义不可变量    可运行时初始化  可覆盖定义
 var         定义可变变量    可运行时初始化  可覆盖定义
 const       定义常量        编译时求值 位于全局 静态不可覆盖
 static      定义静态变量    编译时求职 位于全局 静态不可覆盖
-extern      引入外部函数    或者把定义的东西改成 C 规范    或者声明局部变量为全局（类似py的global）
+extern      引入外部函数或变量    或者把定义的东西改成其它语言规范    或者声明局部变量为全局（类似py的global）    extern "C" int c_var;  extern "C++" int cpp_var;  extern extern_var
 do          执行代码块并返回值
 loop        无限循环
 while       条件循环    while(true) 会被编译器优化成 loop ，else的代码会被剔除      配合 do 关键字可以实现先循环后判断 (do while)
-for         步骤循环/遍历循环 支持两种语法   for (;;) 会被编译器优化成 loop ，else的代码会被剔除    支持遍历，通过调用类型的 __each__ 方法实现 for (<init>;<cond>;<step>)|for (let i:i32 = 1..10..2)|for (let i = array)
+for         步骤循环/遍历循环 支持两种语法   for (;;) 会被编译器优化成 loop ，else的代码会被剔除    支持遍历，通过调用类型的 __each__ 方法实现 for (<init>;<cond>;<step>)|for (let i:i32 in 1..10..2)|for (let i in array)
 try         执行代码块并配合 catch 捕捉异常     支持 RAII: try(){}    此语法是糖，背后的实现是 Result 机制  一个 try 后面最少跟着一个 catch 或 finally
 catch       配合 try 捕捉异常
 finally     当 try 代码和 catch 代码执行完毕后立即运行
@@ -22,20 +23,20 @@ match       匹配结构，无穿透
 case        匹配一个或多个值
 default     未匹配到时执行的代码
 asm         内联汇编    当语法为 "LLVM_IR" 时为内联 IR 模式
-del         释放资源（删除所有权）  调用对象的 __delete__ 方法释放资源    超出作用域的对象会调用一次这个方法释放资源
+del         释放资源（删除所有权）  调用对象的 __del__ 方法释放资源    超出作用域的对象会调用一次这个方法释放资源
 break       打断循环或穿透
 continue    跳过本次循环
-class       创建类 语法糖 方法函数存在全局 类变量和虚表储存在结构体
+class       创建类 语法糖 方法函数存在全局 类变量和虚表储存在结构体    构建函数 __new__
 return      函数返回
-new         初始化对象 默认在栈分配内存    可通过 #[op_symbol("new")] 更改分配行为
 heap        初始化对象 只会在堆分配内存 也能让变量被分配在堆 依赖 stdlib    #[op_symbol("heap")]
-virtual     使得类的方法函数可被动态替换并储存在虚表 新的方法函数必须和旧的参数类型、返回值完全相同
+dyn         使得类的方法函数可被动态替换并储存在虚表 新的方法函数必须和旧的参数类型、返回值完全相同
+final       
 pub         使得定义的东西被公开
 enum        定义枚举类型
-struct      定义结构体类型 支持链表
+struct      定义结构体类型 支持链表 支持默认值
 union       定义联合体类型
-true        常量    布尔类型 真
-false       常量    布尔类型 假
+true        常量    布尔类型 真         LLVM: (i1)1
+false       常量    布尔类型 假         LLVM: (i1)0
 async       异步执行 此类语句依赖 stdlib    #[op_symbol("async")] 此属性描述的函数承担异步线程池处理等
 await       异步等待                        #[op_symbol("await")] 此属性描述的函数承担异步等待
 self        常量    在 Class 中是指向类自身的指针类型   其余地方是 NULL
@@ -49,7 +50,6 @@ null        常量    代表空指针或无返回值的函数
 -   sub
 *   mul
 /   div
-\   sdiv
 ^   pwr
 %   rem
 ++  self-add
@@ -62,26 +62,89 @@ null        常量    代表空指针或无返回值的函数
 
 ==  eq
 !=  ne
+=== is
+!== is_not
 >   gr
 <   lt
 >=  ge
 <=  le
 in  contain
-&&  logic-and   
-||  logic-or    
+&&  logic_and
+||  logic_or    
 
 =   assign
 ::  subitem
 .   member
-$   raw_name
-?   macro_name
-?$  raw_macro_name
+$   macro
 ..  number_range
 ''  u32
 ""  u8[]+\0
-``  
 
+``  org_name
+=>  lambda_function
 @   decorator_function
 ;   newline
-\\  comment
+//  comment
+/*  multi_line_comment.start
+*/  multi_line_comment.end
 #[...]  attribute
+
+
+基本类型
+bool        布尔类型
+i8          8 位有符号整数
+i16         16位有符号整数
+i32         32位有符号整数
+i64         64位有符号整数
+i128        128位有符号整数
+u8          8 位无符号整数
+u16         16位无符号整数
+u32         32位无符号整数
+u64         64位无符号整数
+u128        128位无符号整数
+f32         单精度浮点数
+f64         双精度浮点数
+isize       指针大小有符号整数  intptr
+usize       指针大小无符号整数  size_t
+str         i8[]    C 字符串
+
+类的魔法方法（类py）：
+__new__     新建对象时调用，用于分配内存
+__init__    新建对象后调用，用于初始化资源
+__del__     对象超出作用域时调用，释放资源
+__try__     进入 RAII try 范围时调用，初始化资源
+__exit__    离开 RAII try 范围时调用，释放资源
+__call__    对象被调用时重定向到此方法
+__equ__     对象被比较相等时调用此方法
+__neq__     对象被比较不等时调用此方法
+__not__     非运算时调用此方法
+__gr__      比较大于时调用此方法
+__lt__      比较小于时调用此方法
+__ge__      比较大于等于时调用此方法
+__le__      比较小于等于时调用此方法
+__and__     和运算时调用此方法
+__or__      或运算时调用此方法
+__xand__    异和运算时调用此方法
+__xor__     异或运算时调用此方法
+
+属性：
+#[no_stdlib]            决定是否禁用 stdlib （裸机编程）
+#[no_weblib]            决定是否禁用 weblib
+#[cls_getter]           使得一个类方法函数修饰成 getter
+#[cls_setter]           使得一个类方法函数修饰成 setter
+
+内置库
+baselib::macrodef       内置宏定义
+baselib::typedef        基本类型定义
+
+标准库
+
+内置宏
+$sizeof(var) isize  获取一个变量占用的内存大小
+$sysequ(str) bool   判断操作系统    如 win32, linux,osx 裸机时 "metal" 为 true
+$cpuequ(str) bool   判断处理器架构  如 x86_64, x86_32, arm64
+$va_list() ... 
+$va_len() usize
+$__func__() str
+$__class__() str
+$__module__() str
