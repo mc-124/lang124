@@ -1,8 +1,17 @@
+编译流程：
+source  转换 AST            (lang124c::parsing)     -> RawAST
+RawAST  执行宏与更改 AST    (lang124c::preproc)     -> PreAST
+PreAST  合并删除冗余代码    (lang124c::optimize)    -> OptAST
+OptAST  转换为 LLVM-IR      (lang124c::ast2llvm)    -> IR
+IR      编译为汇编或机器码  (lang124c::llvm_core)   -> Obj
+Obj     链接为可执行或库    (link/ld/lld/wasm_ld)   -> Execute/Library
+
+
 关键字：
 use         导入命名空间   或者在一个命名空间里引入同级或更低级的命名空间   或给类型起小名 use NewType = OldType  使用 c:"filepath" 导入 C 头文件（直接），使用 cpp:"filepath" 导入 C++ 头文件（依赖 C++ 编译器）
 module      定义命名空间
 macro       定义宏
-fn          函数支持嵌套定义   函数名前加上@为定义修饰器函数
+fn          函数支持嵌套定义   函数名前加上@为定义修饰器函数    lambda函数：fn() <?ret> {<body>}    const a = fn(i32 a, i64 b){a+b}
 let         定义不可变量    可运行时初始化  可覆盖定义
 var         定义可变变量    可运行时初始化  可覆盖定义
 const       定义常量        编译时求值 位于全局 静态不可覆盖
@@ -12,7 +21,8 @@ do          执行代码块并返回值
 loop        无限循环
 while       条件循环    while(true) 会被编译器优化成 loop ，else的代码会被剔除      配合 do 关键字可以实现先循环后判断 (do while)
 for         步骤循环/遍历循环 支持两种语法   for (;;) 会被编译器优化成 loop ，else的代码会被剔除    支持遍历，通过调用类型的 __each__ 方法实现 for (<init>;<cond>;<step>)|for (let i:i32 in 1..10..2)|for (let i in array)
-try         执行代码块并配合 catch 捕捉异常     支持 RAII: try(){}    此语法是糖，背后的实现是 Result 机制  一个 try 后面最少跟着一个 catch 或 finally
+in          判断一个对象是否含有另一个对象      需要类的 __in__ 方法
+try         执行代码块并配合 catch 捕捉异常     支持 RAII: try(){}    此语法是糖，背后的实现是 Result 机制  一个 try 后面最少跟着一个 catch 或 finally      若代码块内无可能被执行到的 throw 则由前端编译器删除多余的 try 和 throw
 catch       配合 try 捕捉异常
 finally     当 try 代码和 catch 代码执行完毕后立即运行
 if          如果分支结构
@@ -27,10 +37,9 @@ del         释放资源（删除所有权）  调用对象的 __del__ 方法释
 break       打断循环或穿透
 continue    跳过本次循环
 class       创建类 语法糖 方法函数存在全局 类变量和虚表储存在结构体    构建函数 __new__
-return      函数返回
+return      函数返回        是语法糖，背后的实现是 Result => Ok 或 return
 heap        初始化对象 只会在堆分配内存 也能让变量被分配在堆 依赖 stdlib    #[op_symbol("heap")]
 dyn         使得类的方法函数可被动态替换并储存在虚表 新的方法函数必须和旧的参数类型、返回值完全相同
-final       
 pub         使得定义的东西被公开
 enum        定义枚举类型
 struct      定义结构体类型 支持链表 支持默认值
@@ -60,6 +69,7 @@ null        常量    代表空指针或无返回值的函数
 !&  xand
 !|  xor
 
+
 ==  eq
 !=  ne
 === is
@@ -81,13 +91,15 @@ $   macro
 ""  u8[]+\0
 
 ``  org_name
-=>  lambda_function
 @   decorator_function
 ;   newline
 //  comment
 /*  multi_line_comment.start
 */  multi_line_comment.end
-#[...]  attribute
+
+
+#[...]          属性
+<T[...],...>    泛型    每个泛型可以指定范围
 
 
 基本类型
@@ -109,23 +121,29 @@ usize       指针大小无符号整数  size_t
 str         i8[]    C 字符串
 
 类的魔法方法（类py）：
-__new__     新建对象时调用，用于分配内存
-__init__    新建对象后调用，用于初始化资源
-__del__     对象超出作用域时调用，释放资源
-__try__     进入 RAII try 范围时调用，初始化资源
-__exit__    离开 RAII try 范围时调用，释放资源
-__call__    对象被调用时重定向到此方法
-__equ__     对象被比较相等时调用此方法
-__neq__     对象被比较不等时调用此方法
-__not__     非运算时调用此方法
-__gr__      比较大于时调用此方法
-__lt__      比较小于时调用此方法
-__ge__      比较大于等于时调用此方法
-__le__      比较小于等于时调用此方法
-__and__     和运算时调用此方法
-__or__      或运算时调用此方法
-__xand__    异和运算时调用此方法
-__xor__     异或运算时调用此方法
+__new__     self    新建对象时调用，用于分配内存
+__init__    null    新建对象后调用，用于初始化资源
+__del__     null    对象超出作用域时调用，释放资源
+__try__     null    进入 RAII try 范围时调用，初始化资源
+__exit__    null    离开 RAII try 范围时调用，释放资源
+__call__    any     对象被调用时重定向到此方法
+__equ__     bool    对象被比较相等时调用此方法
+__neq__     bool    对象被比较不等时调用此方法
+__gr__      bool    比较大于时调用此方法
+__lt__      bool    比较小于时调用此方法
+__ge__      bool    比较大于等于时调用此方法
+__le__      bool    比较小于等于时调用此方法
+__in__      bool    判断对象是否含有另一个对象
+__and__     any     和运算时调用此方法
+__or__      any     或运算时调用此方法
+__not__     any     非运算时调用此方法
+__xand__    any     异和运算时调用此方法
+__xor__     any     异或运算时调用此方法
+__add__     any     加法函数     
+__sub__     any     减法函数
+__mul__     any     乘法函数
+__div__     any     除法函数
+__rem__     any     求余函数
 
 属性：
 #[no_stdlib]            决定是否禁用 stdlib （裸机编程）
@@ -143,8 +161,6 @@ baselib::typedef        基本类型定义
 $sizeof(var) isize  获取一个变量占用的内存大小
 $sysequ(str) bool   判断操作系统    如 win32, linux,osx 裸机时 "metal" 为 true
 $cpuequ(str) bool   判断处理器架构  如 x86_64, x86_32, arm64
-$va_list() ... 
-$va_len() usize
-$__func__() str
-$__class__() str
-$__module__() str
+$va_list() *[]      变长参数数组
+$va_len() usize     变长参数数组长度
+$generic(v,t) bool  在泛型函数中用于判断类型
